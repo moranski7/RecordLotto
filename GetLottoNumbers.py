@@ -1,6 +1,26 @@
 import sys
+import os
+import csv
+from datetime import datetime
+
+def fileExistCheck(fileName):
+	"""Check to see if a file exist. True if yes. False otherwise."""
+	return os.path.isfile(fileName)
+
+
+def areNumbersRecorded(fileName):
+	"""Check to see if numbers have been recorded. Checks for today's date in csv file. Returns True if yes. False otherwise."""
+	today = datetime.today().strftime('%Y-%m-%d')
+	with open(fileName, "r") as csvfile:
+		csvReader = csv.DictReader(csvfile)
+		for row in csvReader:
+			if today in row.values():
+				return True
+		csvfile.close()
+	return False
 
 def isConnected():
+	""""""
 	import requests
 	test_connection = requests.get("https://www.google.com/")
 	return test_connection.status_code == 200
@@ -40,10 +60,7 @@ def getLottoNumbers(html):
 	return lottoMaxNumbers, lotto649Numbers
 
 def writeToCsvFile(fileName, lottoNumbers):
-	import csv
-	import os
-	from datetime import datetime
-	fileExist = os.path.isfile(fileName)
+	fileExist = fileExistCheck(fileName)
 	if fileExist:
 		with open(fileName, "a+") as csvfile:
 			fieldnames = ["Number", "Date(YYYY-MM-DD)"]
@@ -64,12 +81,22 @@ def writeToCsvFile(fileName, lottoNumbers):
 
 def recordLottoNumbers():
 	#Check file for Today's date to avoid double recording
-	html = getLottoWinningPage()
+	html = None
+	LottoMaxFile = r"Lotto_Max_Numbers.csv"
+	Lotto649File = r"Lotto_649_Numbers.csv"
+
+	if not fileExistCheck(LottoMaxFile) and not fileExistCheck(Lotto649File):
+		html = getLottoWinningPage()
+	elif not areNumbersRecorded(LottoMaxFile) and not areNumbersRecorded(Lotto649File):
+		html = getLottoWinningPage()
+	else:
+		html = None
+		print("Nothing done.")
 
 	if html:
 		lottoMaxNumbers,lotto649Numbers = getLottoNumbers(html)
-		writeToCsvFile(r"Lotto_Max_Numbers.csv", lottoMaxNumbers)
-		writeToCsvFile(r"Lotto_649_Numbers.csv", lotto649Numbers)
+		writeToCsvFile(LottoMaxFile, lottoMaxNumbers)
+		writeToCsvFile(Lotto649File, lotto649Numbers)
 	else:
 		print("TBA")
 		sys.exit(1)
