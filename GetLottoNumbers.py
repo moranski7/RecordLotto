@@ -136,15 +136,21 @@ def writeToCsvFile(fileName, lottoNumbers):
 
 def recordTotal(lottoMaxNumbers, lotto649Numbers):
 	"""Opens the tracked_Numbers.txt file and tally the new number lotto numbers into the result.
-	If params are None, nothing happens.
+	If params are None, nothing happens."""
 
-	Note: Function assumes that tracked_Numbers.txt file exists."""
-	with open("tracked_Numbers.txt", "r") as file:
-		stringMax = file.readline()
-		string649 = file.readline()
-		file.close()
-	numbersMax = [int(x) for x in stringMax.strip().split(",")]
-	numbers649 = [int(x) for x in string649.strip().split(",")]
+	#If file exist, the contents of these lists will be replaced with 
+	try:
+		with open("tracked_Numbers.txt", "r") as file:
+			stringMax = file.readline()
+			string649 = file.readline()
+			file.close()
+		numbersMax = [int(x) for x in stringMax.strip().split(",")]
+		numbers649 = [int(x) for x in string649.strip().split(",")]
+	except FileNotFoundError:
+		print("File missing. Please ensure tracked_Numbers.txt is available.")
+		#If file does not exist, create new list of zeros for tallying
+		numbersMax = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		numbers649 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 	if lottoMaxNumbers:
 		for x in lottoMaxNumbers:
