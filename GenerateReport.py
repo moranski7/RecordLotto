@@ -48,6 +48,56 @@ def generateImage (numbersAvail,numbersCount, xLabel, imageName):
 	plt.savefig(imageName,dpi=400)
 	return
 
+def makeHTML():
+	with open("Lotto Report.html", "w") as file:
+		file.write(r"<!DOCTYPE html>")
+		file.write(r"<html>")
+		
+		file.write("\t<head>")
+		file.write("\t<title>Lotto Number Suggestor</title>")
+		file.write("<link rel=\"stylesheet\" href=\"report.css\"")
+		file.write("\t<meta charset=\"UTF-8\">")
+		file.write("\t</head>")
+		
+		file.write("\t<body>")
+		file.write("\t<h1>Lotto Number Suggestor</h1>")
+		file.write("\t<table border =\"1\" Class=\"\">")
+		
+		file.write("\t\t<tr>")
+		file.write("\t\t\t<td>")
+		file.write("\t\t\t<h2>Lotto Max Numbers</h2>")
+		file.write("\t\t\t<p Class=\"\"></p>")
+		file.write("\t\t\t<p Class=\"\"></p>")
+		file.write("\t\t\t<p Class=\"\"></p>")
+		file.write("\t\t\t<p Class=\"\"></p>")
+		file.write("\t\t\t</td>")
+		
+		file.write("\t\t\t<td>")
+		file.write("\t\t\t<h2>Lotto 649 Numbers</h2>")
+		file.write("\t\t\t<p Class=\"\"></p>")
+		file.write("\t\t\t<p Class=\"\"></p>")
+		file.write("\t\t\t<p Class=\"\"></p>")
+		file.write("\t\t\t<p Class=\"\"></p>")
+		file.write("\t\t\t</td>")
+		file.write("\t\t</tr>")
+
+
+		file.write("\t\t<tr>")
+		file.write("\t\t\t<td>")
+		file.write("\t\t\t<h2>Lotto Max Analysis</h2>")
+		file.write("\t\t\t<img id=\"\" Class=\"barplot\" src=\"MaxFreq.png\" alt=\"Max Numbers Frequency\">")
+		file.write("\t\t\t</td>")
+		file.write("\t\t\t<td>")
+		file.write("\t\t\t<h2>Lotto 649 Analysis</h2>")
+		file.write("\t\t\t<img id=\"\" Class=\"barplot\" src=\"649Freq.png\" alt=\"649 Numbers Frequency\">")
+		file.write("\t\t\t</td>")
+		file.write("\t\t</tr>")
+
+		file.write("\t</table>")
+		file.write("\t</body>")
+		file.write(r"</html>")
+		file.close()
+	return
 
 def generateReport():
 	LottoMaxFile = r"Lotto_Max_Numbers.csv"
@@ -71,6 +121,7 @@ def generateReport():
 		generateImage (numbersIn649, numbers649, 'Numbers in Lotto 649', "649Freq.png")
 		avg649 = [(x/lott649Count) for x in numbers649]
 
+	makeHTML()
 	return
 
 def main():
