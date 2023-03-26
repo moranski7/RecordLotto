@@ -3,23 +3,36 @@ import os
 import csv
 from datetime import datetime
 
+DEBUG = False
+
 def fileExistCheck(fileName):
 	"""Check to see if a file exist. True if yes. False otherwise."""
 	return os.path.isfile(fileName)
 
+def initNumberPosList(size, value):
+	listNumber = []
+	for _ in range(size):
+		listNumber.append(value.copy())
+	return listNumber
+
 def restoreTotal (fileMax, file649):
 	"""Creates a text file for collecting the total times numbers in a lotto has appeared. If csv files exist, tallies the total
 	for that lotto. Writes to new file."""
+	totalMaxRows = 0
+	total649Rows = 0
 	totalMax = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	total649 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	numMaxPos = initNumberPosList (7, totalMax)
+	num649Pos = initNumberPosList (6, total649)
 
 	#If csv record for lotto Max exist, read the file and tallies the numbers.
 	if fileExistCheck(fileMax):
 		with open(fileMax, "r") as csvfile:
 			r = csv.DictReader(csvfile)
 			for row in r:
-				for x in row["Number"].split(","):
-					totalMax[int(x)] += 1
+				for index, x in enumerate(row["Number"].split(",")):
+					numMaxPos[index][int(x)] += 1 
+				totalMaxRows += 1
 			csvfile.close()
 
 	#If csv record for lotto 649 exist, read the file and tallies the numbers.
@@ -27,17 +40,25 @@ def restoreTotal (fileMax, file649):
 		with open(file649, "r") as csvfile:
 			r = csv.DictReader(csvfile)
 			for row in r:
-				for x in row["Number"].split(","):
-					total649[int(x)] += 1
+				for index, x in enumerate(row["Number"].split(",")):
+					num649Pos[index][int(x)] += 1
+				total649Rows += 1
 			csvfile.close()
 
 	#Record new total to text file.
 	with open("tracked_Numbers.txt", "w") as file:
-		stringMax = ",".join([str(x) for x in totalMax])
-		string649 = ",".join(str(x) for x in total649)
-		file.write(stringMax)
+		file.write(str(totalMaxRows))
 		file.write("\n")
-		file.write(string649)
+		for row in numMaxPos:
+			stringMax = ",".join([str(x) for x in row])
+			file.write(stringMax)
+			file.write("\n")
+		file.write(str(total649Rows))
+		file.write("\n")
+		for row in num649Pos:
+			string649 = ",".join(str(x) for x in row)
+			file.write(string649)
+			file.write("\n")
 		file.close()
 	return
 
@@ -137,34 +158,53 @@ def writeToCsvFile(fileName, lottoNumbers):
 def recordTotal(lottoMaxNumbers, lotto649Numbers):
 	"""Opens the tracked_Numbers.txt file and tally the new number lotto numbers into the result.
 	If params are None, nothing happens."""
+	countMax = 0
+	listMaxNumbers = []
+	count649 = 0
+	list649Numbers = []
 
 	#If file exist, the contents of these lists will be replaced with 
 	try:
 		with open("tracked_Numbers.txt", "r") as file:
-			stringMax = file.readline()
-			string649 = file.readline()
+			countMax = int(file.readline().strip())
+			for _ in range(0,7):
+				stringMaxLine = file.readline()
+				listMaxNumbers.append([int(x) for x in stringMaxLine.strip().split(",")])
+			
+			count649 = int(file.readline().strip())
+			for _ in range(0,6):
+				string649Line = file.readline()
+				list649Numbers.append([int(x) for x in string649Line.strip().split(",")])
 			file.close()
-		numbersMax = [int(x) for x in stringMax.strip().split(",")]
-		numbers649 = [int(x) for x in string649.strip().split(",")]
 	except FileNotFoundError:
 		print("File missing. Please ensure tracked_Numbers.txt is available.")
 		#If file does not exist, create new list of zeros for tallying
-		numbersMax = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-		numbers649 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+		listMaxNumbers = initNumberPosList (7, listMaxNumbers)
+		list649Numbers = initNumberPosList (6, list649Numbers)
 
 	if lottoMaxNumbers:
-		for x in lottoMaxNumbers:
-			numbersMax[int(x)] += 1
+		countMax += 1
+		for index,num in enumerate(lottoMaxNumbers):
+			listMaxNumbers[index][int(num)] += 1;
 	if lotto649Numbers:
-		for x in lotto649Numbers:
-			numbers649[int(x)] += 1
-	newNumMax = ",".join(str(x) for x in numbersMax)
-	newNum649 = ",".join(str(x) for x in numbers649)
+		count649 += 1
+		for index,num in enumerate(lotto649Numbers):
+			list649Numbers[index][int(num)] += 1
 
 	with open("tracked_numbers.txt", "w") as file:
-		file.write(newNumMax)
+		file.write(str(countMax))
 		file.write("\n")
-		file.write(newNum649)
+		for row in listMaxNumbers:
+			stringMax = ",".join([str(x) for x in row])
+			file.write(stringMax)
+			file.write("\n")
+		
+		file.write(str(count649))
+		file.write("\n")
+		for row in list649Numbers:
+			string649 = ",".join(str(x) for x in row)
+			file.write(string649)
+			file.write("\n")
 		file.close()
 	return
 
@@ -186,10 +226,10 @@ def recordLottoNumbers():
 	else:
 		html = None
 		print("Nothing done.")
-
+	
 	if html:
 		lottoMaxNumbers,lotto649Numbers = getLottoNumbers(html) #Parse webpage using regex.
-
+	
 		if lottoMaxNumbers:
 			writeToCsvFile(LottoMaxFile, lottoMaxNumbers)
 		if lotto649Numbers:
