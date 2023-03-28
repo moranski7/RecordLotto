@@ -1,4 +1,4 @@
-# RecordO
+# RecordLotto
 
 The purpose of this project is to generate a series of lotto numbers as a suggestion for Lotto Max and Lotto 649. This is achieved by pulling the winning numbers from olg website, talling the number of times each number has appeared in each position, and then randomly choosing the numbers using the tally as a weight. This project is divided into two separate programs: GetLottoNumbers.py and GenerateReport.py.
 
